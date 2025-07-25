@@ -63,17 +63,17 @@ func DefaultRequestDecoder(r *http.Request, v any) error {
 	if !ok {
 		return errors.BadRequest("CODEC", fmt.Sprintf("unregister Content-Type: %s", r.Header.Get("Content-Type")))
 	}
+	
 	data, err := io.ReadAll(r.Body)
-
-	// reset body.
-	r.Body = io.NopCloser(bytes.NewBuffer(data))
-
 	if err != nil {
 		return errors.BadRequest("CODEC", err.Error())
 	}
 	if len(data) == 0 {
 		return nil
 	}
+
+	// reset body.
+	r.Body = io.NopCloser(bytes.NewBuffer(data))
 	if err = codec.Unmarshal(data, v); err != nil {
 		return errors.BadRequest("CODEC", fmt.Sprintf("body unmarshal %s", err.Error()))
 	}
